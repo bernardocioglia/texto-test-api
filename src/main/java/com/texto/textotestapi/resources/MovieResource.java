@@ -1,5 +1,6 @@
 package com.texto.textotestapi.resources;
 
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,9 +42,12 @@ public class MovieResource {
 		final Hashtable<String, Producer> max = new Hashtable<>();
 		for (final Movie movie : winners) {
 
-			// TODO: talvêz seja intereassante separar os nomes do produtores e avaliar
+			// TODO: talvêz seja intereassante separar os nomes dos produtores e avaliar
 			// independentemente cada um
+
+			// TODO refatorar e extrair os metodos
 			// MAX
+			// criar os objetos producer
 			if (max.containsKey(movie.getProducers())) {
 				final Producer producer = max.get(movie.getProducers());
 				final Integer newInterval = producer.getPreviousWin() - movie.getReleaseYear();
@@ -64,9 +68,8 @@ public class MovieResource {
 				max.put(movie.getProducers(), producer);
 			}
 
-			// TODO: talvêz seja intereassante separar os nomes do produtores e avaliar
-			// independentemente cada um
 			// MIN
+			// criar os objetos producer
 			if (min.containsKey(movie.getProducers())) {
 				final Producer producer = min.get(movie.getProducers());
 				// producer.update(movie.getReleaseYear());
@@ -91,12 +94,18 @@ public class MovieResource {
 
 		}
 
-		// TODO: filtrar apenas os maiores
+		// filtrar apenas os maiores
 		final List<Producer> maxList = max.values().stream().filter(p -> p.getFollowingWin() != null)
-				.collect(Collectors.toList());
-		// TODO: filtrar apenas os menores
+				.sorted(Comparator.comparing(Producer::getInterval)).collect(Collectors.toList());
+		final Integer maxInterval = maxList.get(maxList.size() - 1).getInterval();
+		maxList.removeIf(p -> p.getInterval() < maxInterval);
+
+		// filtrar apenas os menores
 		final List<Producer> minList = min.values().stream().filter(p -> p.getFollowingWin() != null)
-				.collect(Collectors.toList());
+				.sorted(Comparator.comparing(Producer::getInterval)).collect(Collectors.toList());
+		final Integer minInterval = minList.get(0).getInterval();
+		minList.removeIf(p -> p.getInterval() > minInterval);
+
 		final MinMaxProducers minMaxProducers = new MinMaxProducers(minList, maxList);
 		return ResponseEntity.ok(minMaxProducers);
 	}
