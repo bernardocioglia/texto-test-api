@@ -1,6 +1,7 @@
 package com.texto.textotestapi.resources;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,10 +68,14 @@ public class MovieResource {
 
 		}
 
-		// filtrar apenas os maiores
 		List<Producer> maxList = new ArrayList<Producer>();
 		List<Producer> minList = new ArrayList<Producer>();
 		if (producersList.size() > 0) {
+
+			// ordernar a lista
+			producersList.sort(Comparator.comparing(Producer::getInterval));
+
+			// filtrar apenas os maiores
 			final Integer maxInterval = producersList.get(producersList.size() - 1).getInterval();
 			maxList = producersList.stream().filter(p -> p.getInterval() == maxInterval).collect(Collectors.toList());
 
