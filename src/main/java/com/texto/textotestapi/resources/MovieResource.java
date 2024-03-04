@@ -42,54 +42,58 @@ public class MovieResource {
 		final Hashtable<String, Producer> max = new Hashtable<>();
 		for (final Movie movie : winners) {
 
-			// TODO: talvêz seja intereassante separar os nomes dos produtores e avaliar
-			// independentemente cada um
+			// separa os nomes do produtores
+			final String[] producersNames = movie.getProducers().split(",");
 
-			// TODO refatorar e extrair os metodos
-			// MAX
-			// criar os objetos producer
-			if (max.containsKey(movie.getProducers())) {
-				final Producer producer = max.get(movie.getProducers());
-				final Integer newInterval = producer.getPreviousWin() - movie.getReleaseYear();
-				if (Math.abs(newInterval) > producer.getInterval()) {
-					if (newInterval > 0) {
-						producer.setFollowingWin(producer.getPreviousWin());
-						producer.setPreviousWin(movie.getReleaseYear());
-					} else {
-						producer.setFollowingWin(movie.getReleaseYear());
-					}
-					producer.setInterval(Math.abs(newInterval));
-				}
-			} else {
-				final Producer producer = new Producer();
-				producer.setProducer(movie.getProducers());
-				producer.setInterval(Integer.MIN_VALUE);
-				producer.setPreviousWin(movie.getReleaseYear());
-				max.put(movie.getProducers(), producer);
-			}
+			for (String producerName : producersNames) {
+				producerName = producerName.trim();
 
-			// MIN
-			// criar os objetos producer
-			if (min.containsKey(movie.getProducers())) {
-				final Producer producer = min.get(movie.getProducers());
-				// producer.update(movie.getReleaseYear());
-				final Integer newInterval = producer.getPreviousWin() - movie.getReleaseYear();
-				if (Math.abs(newInterval) < producer.getInterval()) {
-					if (newInterval > 0) {
-						producer.setFollowingWin(producer.getPreviousWin());
-						producer.setPreviousWin(movie.getReleaseYear());
-					} else {
-						producer.setFollowingWin(movie.getReleaseYear());
+				// TODO refatorar e extrair os metodos
+				// MAX
+				// criar os objetos producer
+				if (max.containsKey(producerName)) {
+					final Producer producer = max.get(producerName);
+					final Integer newInterval = producer.getPreviousWin() - movie.getReleaseYear();
+					if (Math.abs(newInterval) > producer.getInterval()) {
+						if (newInterval > 0) {
+							producer.setFollowingWin(producer.getPreviousWin());
+							producer.setPreviousWin(movie.getReleaseYear());
+						} else {
+							producer.setFollowingWin(movie.getReleaseYear());
+						}
+						producer.setInterval(Math.abs(newInterval));
 					}
-					producer.setInterval(Math.abs(newInterval));
+				} else {
+					final Producer producer = new Producer();
+					producer.setProducer(producerName);
+					producer.setInterval(Integer.MIN_VALUE);
+					producer.setPreviousWin(movie.getReleaseYear());
+					max.put(producerName, producer);
 				}
 
-			} else {
-				final Producer producer = new Producer();
-				producer.setProducer(movie.getProducers());
-				producer.setInterval(Integer.MAX_VALUE);
-				producer.setPreviousWin(movie.getReleaseYear());
-				min.put(movie.getProducers(), producer);
+				// MIN
+				// criar os objetos producer
+				if (min.containsKey(producerName)) {
+					final Producer producer = min.get(producerName);
+					final Integer newInterval = producer.getPreviousWin() - movie.getReleaseYear();
+					if (Math.abs(newInterval) < producer.getInterval()) {
+						if (newInterval > 0) {
+							producer.setFollowingWin(producer.getPreviousWin());
+							producer.setPreviousWin(movie.getReleaseYear());
+						} else {
+							producer.setFollowingWin(movie.getReleaseYear());
+						}
+						producer.setInterval(Math.abs(newInterval));
+					}
+
+				} else {
+					final Producer producer = new Producer();
+					producer.setProducer(producerName);
+					producer.setInterval(Integer.MAX_VALUE);
+					producer.setPreviousWin(movie.getReleaseYear());
+					min.put(producerName, producer);
+				}
+
 			}
 
 		}
