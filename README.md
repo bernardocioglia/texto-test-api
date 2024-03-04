@@ -26,11 +26,23 @@ etc).
 
 ## Instalação
 
-Obter o código fonte do repositório:
-Importar o projeto em uma. (e.g. Eclipse. STS, InteliJ)
-`https://github.com/bernardocioglia/texto-test-api.git`
+1. Obter o código fonte do repositório:
+	`https://github.com/bernardocioglia/texto-test-api.git`
+2. Importar o projeto em uma IDE. (e.g. Eclipse. STS, InteliJ IDEA, VS Code)
+   - obs: _O projeto foi implementado usando Spring Tool Suite 4_
+   - obs2: _Este projeto foi implementado usando JDK 21_
+
+3. Importar o arquivo texto-test-api.postman_collection.json no Postman
+   - obs: arquivo se encontra na pasta raiz do projeto
 
 ## Como testar
 
-Iniciar o serviço "texto-test-api".
-Executar os testes de integração usando o postman.
+1. Iniciar o serviço "texto-test-api".
+2. Executar os testes de integração usando o postman.
+
+## End poits
+### Foram criados 3 pontos de teste de integração:
+1. Visualizar todos os registros inseridos no banco: **AllMovies**
+2. Visualizar todos os filmes premiados: **AllWinners**
+3. Visualizar os produtores com maiores e menores periodos entre dois prêmios consecutivos: **ProducersMinMax**
+
