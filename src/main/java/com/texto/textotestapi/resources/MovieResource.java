@@ -36,11 +36,10 @@ public class MovieResource {
 	@GetMapping(value = "/producers")
 	public ResponseEntity<MinMaxProducers> findProducers() {
 
-		// TODO: avaliar usar uma busca ordenada para reduzir o custo da iteração
 		final List<Movie> winners = this.repository.findAllWinners();
 
 		final Hashtable<String, ArrayList<Integer>> producerYearsHashtable = new Hashtable<>();
-		final List<Producer> producersList = new ArrayList<Producer>();
+		final List<Producer> producers = new ArrayList<Producer>();
 
 		for (final Movie movie : winners) {
 
@@ -58,7 +57,7 @@ public class MovieResource {
 						final Integer followingWin = years.get(years.size() - 1);
 						final Integer interval = followingWin - previousWin;
 						final Producer producer = new Producer(producerName, interval, previousWin, followingWin);
-						producersList.add(producer);
+						producers.add(producer);
 					}
 
 				} else {
@@ -70,18 +69,18 @@ public class MovieResource {
 
 		List<Producer> maxList = new ArrayList<Producer>();
 		List<Producer> minList = new ArrayList<Producer>();
-		if (producersList.size() > 0) {
+		if (producers.size() > 0) {
 
 			// ordernar a lista
-			producersList.sort(Comparator.comparing(Producer::getInterval));
+			producers.sort(Comparator.comparing(Producer::getInterval));
 
 			// filtrar apenas os maiores
-			final Integer maxInterval = producersList.get(producersList.size() - 1).getInterval();
-			maxList = producersList.stream().filter(p -> p.getInterval() == maxInterval).collect(Collectors.toList());
+			final Integer maxInterval = producers.get(producers.size() - 1).getInterval();
+			maxList = producers.stream().filter(p -> p.getInterval() == maxInterval).collect(Collectors.toList());
 
 			// filtrar apenas os menores
-			final Integer minInterval = producersList.get(0).getInterval();
-			minList = producersList.stream().filter(p -> p.getInterval() == minInterval).collect(Collectors.toList());
+			final Integer minInterval = producers.get(0).getInterval();
+			minList = producers.stream().filter(p -> p.getInterval() == minInterval).collect(Collectors.toList());
 
 		}
 		final MinMaxProducers minMaxProducers = new MinMaxProducers(minList, maxList);
