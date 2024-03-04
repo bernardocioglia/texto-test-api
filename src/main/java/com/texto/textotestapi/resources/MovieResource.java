@@ -1,6 +1,6 @@
 package com.texto.textotestapi.resources;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,78 +38,47 @@ public class MovieResource {
 		// TODO: avaliar usar uma busca ordenada para reduzir o custo da iteração
 		final List<Movie> winners = this.repository.findAllWinners();
 
-		final Hashtable<String, Producer> min = new Hashtable<>();
-		final Hashtable<String, Producer> max = new Hashtable<>();
+		final Hashtable<String, ArrayList<Integer>> producerYearsHashtable = new Hashtable<>();
+		final List<Producer> producersList = new ArrayList<Producer>();
+
 		for (final Movie movie : winners) {
 
 			// separa os nomes do produtores
-			final String[] producersNames = movie.getProducers().split(",");
+			final String[] producersNames = movie.getProducers().split(",|and");
 
 			for (String producerName : producersNames) {
 				producerName = producerName.trim();
 
-				// TODO refatorar e extrair os metodos
-				// MAX
-				// criar os objetos producer
-				if (max.containsKey(producerName)) {
-					final Producer producer = max.get(producerName);
-					final Integer newInterval = producer.getPreviousWin() - movie.getReleaseYear();
-					if (Math.abs(newInterval) > producer.getInterval()) {
-						if (newInterval > 0) {
-							producer.setFollowingWin(producer.getPreviousWin());
-							producer.setPreviousWin(movie.getReleaseYear());
-						} else {
-							producer.setFollowingWin(movie.getReleaseYear());
-						}
-						producer.setInterval(Math.abs(newInterval));
-					}
-				} else {
-					final Producer producer = new Producer();
-					producer.setProducer(producerName);
-					producer.setInterval(Integer.MIN_VALUE);
-					producer.setPreviousWin(movie.getReleaseYear());
-					max.put(producerName, producer);
-				}
-
-				// MIN
-				// criar os objetos producer
-				if (min.containsKey(producerName)) {
-					final Producer producer = min.get(producerName);
-					final Integer newInterval = producer.getPreviousWin() - movie.getReleaseYear();
-					if (Math.abs(newInterval) < producer.getInterval()) {
-						if (newInterval > 0) {
-							producer.setFollowingWin(producer.getPreviousWin());
-							producer.setPreviousWin(movie.getReleaseYear());
-						} else {
-							producer.setFollowingWin(movie.getReleaseYear());
-						}
-						producer.setInterval(Math.abs(newInterval));
+				if (producerYearsHashtable.containsKey(producerName)) {
+					final ArrayList<Integer> years = producerYearsHashtable.get(producerName);
+					years.add(movie.getReleaseYear());
+					if (years.size() >= 2) {
+						final Integer previousWin = years.get(years.size() - 2);
+						final Integer followingWin = years.get(years.size() - 1);
+						final Integer interval = followingWin - previousWin;
+						final Producer producer = new Producer(producerName, interval, previousWin, followingWin);
+						producersList.add(producer);
 					}
 
 				} else {
-					final Producer producer = new Producer();
-					producer.setProducer(producerName);
-					producer.setInterval(Integer.MAX_VALUE);
-					producer.setPreviousWin(movie.getReleaseYear());
-					min.put(producerName, producer);
+					producerYearsHashtable.put(producerName, new ArrayList<Integer>(List.of(movie.getReleaseYear())));
 				}
-
 			}
 
 		}
 
 		// filtrar apenas os maiores
-		final List<Producer> maxList = max.values().stream().filter(p -> p.getFollowingWin() != null)
-				.sorted(Comparator.comparing(Producer::getInterval)).collect(Collectors.toList());
-		final Integer maxInterval = maxList.get(maxList.size() - 1).getInterval();
-		maxList.removeIf(p -> p.getInterval() < maxInterval);
+		List<Producer> maxList = new ArrayList<Producer>();
+		List<Producer> minList = new ArrayList<Producer>();
+		if (producersList.size() > 0) {
+			final Integer maxInterval = producersList.get(producersList.size() - 1).getInterval();
+			maxList = producersList.stream().filter(p -> p.getInterval() == maxInterval).collect(Collectors.toList());
 
-		// filtrar apenas os menores
-		final List<Producer> minList = min.values().stream().filter(p -> p.getFollowingWin() != null)
-				.sorted(Comparator.comparing(Producer::getInterval)).collect(Collectors.toList());
-		final Integer minInterval = minList.get(0).getInterval();
-		minList.removeIf(p -> p.getInterval() > minInterval);
+			// filtrar apenas os menores
+			final Integer minInterval = producersList.get(0).getInterval();
+			minList = producersList.stream().filter(p -> p.getInterval() == minInterval).collect(Collectors.toList());
 
+		}
 		final MinMaxProducers minMaxProducers = new MinMaxProducers(minList, maxList);
 		return ResponseEntity.ok(minMaxProducers);
 	}
