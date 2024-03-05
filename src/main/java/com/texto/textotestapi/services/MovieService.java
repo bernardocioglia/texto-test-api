@@ -1,44 +1,22 @@
-package com.texto.textotestapi.resources;
+package com.texto.textotestapi.services;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
 import com.texto.textotestapi.entities.Movie;
-import com.texto.textotestapi.repositories.MovieRepository;
+import com.texto.textotestapi.entities.Producer;
+import com.texto.textotestapi.resources.MinMaxProducers;
 
-@RestController
-@RequestMapping(value = "/movies")
-public class MovieResource {
+@Service
+public class MovieService {
 
-	@Autowired
-	private MovieRepository repository;
-
-	public MovieResource() {
-		// TODO Auto-generated constructor stub
-	}
-
-	@GetMapping
-	public ResponseEntity<List<Movie>> findAll() {
-		final List<Movie> list = this.repository.findAll();
-		return ResponseEntity.ok(list);
-
-	}
-
-	@GetMapping(value = "/producers")
-	public ResponseEntity<MinMaxProducers> findProducers() {
-
-		final List<Movie> winners = this.repository.findAllWinners();
-
-		final Hashtable<String, ArrayList<Integer>> producerYearsHashtable = new Hashtable<>();
+	public MinMaxProducers extractMinMaxProducers(final List<Movie> winners) {
+		final HashMap<String, ArrayList<Integer>> producerYearsHashtable = new HashMap<>();
 		final List<Producer> producers = new ArrayList<Producer>();
 
 		for (final Movie movie : winners) {
@@ -69,6 +47,7 @@ public class MovieResource {
 
 		List<Producer> maxList = new ArrayList<Producer>();
 		List<Producer> minList = new ArrayList<Producer>();
+
 		if (producers.size() > 0) {
 
 			// ordernar a lista
@@ -84,13 +63,7 @@ public class MovieResource {
 
 		}
 		final MinMaxProducers minMaxProducers = new MinMaxProducers(minList, maxList);
-		return ResponseEntity.ok(minMaxProducers);
+		return minMaxProducers;
 	}
 
-	@GetMapping(value = "/winners")
-	public ResponseEntity<List<Movie>> findWinners() {
-		final List<Movie> winners = this.repository.findAllWinners();
-
-		return ResponseEntity.ok(winners);
-	}
 }

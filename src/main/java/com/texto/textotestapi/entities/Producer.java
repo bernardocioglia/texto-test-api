@@ -1,4 +1,4 @@
-package com.texto.textotestapi.resources;
+package com.texto.textotestapi.entities;
 
 public class Producer {
 

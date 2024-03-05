@@ -2,6 +2,8 @@ package com.texto.textotestapi.resources;
 
 import java.util.List;
 
+import com.texto.textotestapi.entities.Producer;
+
 public class MinMaxProducers {
 
 	private List<Producer> min;
