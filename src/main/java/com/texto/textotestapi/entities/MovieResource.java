@@ -29,7 +29,6 @@ public class MovieResource {
 	public ResponseEntity<List<Movie>> findAll() {
 		final List<Movie> list = this.repository.findAll();
 		return ResponseEntity.ok(list);
-
 	}
 
 	@GetMapping(value = "/producers")

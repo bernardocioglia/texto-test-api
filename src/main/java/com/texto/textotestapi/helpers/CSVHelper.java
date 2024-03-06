@@ -30,8 +30,6 @@ public class CSVHelper {
 			final Iterable<CSVRecord> csvRecords = csvParser.getRecords();
 
 			for (final CSVRecord csvRecord : csvRecords) {
-				csvRecord.isMapped("year");
-				csvRecord.get(0);
 				final Movie movie = new Movie(null, Integer.valueOf(csvRecord.get("year")), csvRecord.get("title"),
 						csvRecord.get("studios"), csvRecord.get("producers"), csvRecord.get("winner"));
 
